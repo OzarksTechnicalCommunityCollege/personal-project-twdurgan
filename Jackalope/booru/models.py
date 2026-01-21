@@ -10,17 +10,18 @@ class Post(models.Model):
         UNAPPROVED = 'UA', 'Unapproved'
         PUBLISHED = 'PB', 'Published'
 
-    # All fields besides 'content' and 'tags' should be nullable; anonymous users should be able to post but be severely rate-limited.
-    title = models.CharField(max_length=250)
+    # All user-filled fields besides 'content' (and, potentially, 'tags') should be nullable; anonymous users should be able to post but be severely rate-limited.
+    title = models.CharField(max_length=250, default="post")
     # Make sure to add arguments to ImageField when fields are more well-understood.
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     # Individuals making posts are fielded as 'poster' because image content should primarily be attributed to an artist via tagging.
-    # Change 'CASCADE' later in production; I want posts to remain after posters are gone, with only the actual author of an image able to submit deletion requests.
-    poster = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # Posts are not deleted after user deletion; I want posts to remain after posters are gone, with only the actual author of an image able to delete said image externally.
+    # Field is nullable, but I'm not sure if AUTH_USER_MODEL interferes with that ability.
+    poster = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, blank=True, null=True)
     content = models.ImageField()
-    # A list of tags for the post should go here, potentially. I want to figure out a many-to-one relationship so many posts can reference a single tag (or multiple tags for that matter)
-    # A single tag should be able to occupy multiple posts as well, obviously.
-    tags = models.JSONField()
+    # # A list of tags for the post should go below here, potentially. I want to figure out a many-to-one relationship so many posts can reference a single tag (or multiple tags for that matter)
+    # # A single tag should be able to occupy multiple posts as well, obviously. I'm also exploring the usage of composite keys below my models as a method of tagging.
+    # tags = models.JSONField()
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -39,8 +40,29 @@ class Tag(models.Model):
     # Slugs are likely going to be required for ease-of-use in searching later down the line, if I had to hazard a guess.
     # I would like searching via tags to require separation of tags and arguments only by spaces, e.g. "rhinoceros drinking-water resolution:>=100 order:resolution_descending"
     tagSlug = models.SlugField(max_length=250)
-    description = models.TextField()
+    tagType = models.CharField(max_length=50, default='General')
+    description = models.TextField(blank=True, null=True)
 
     class Meta:
         ordering = ['tagSlug']
         indexes = [models.Index(fields=['tagSlug'])]
+
+# Below here are some composite primary keys. The first is a potential route for tag-image relationships, the second is for user favorites, and the third is for a user blacklist.
+
+class PostTags(models.Model):
+    pk = models.CompositePrimaryKey("image", "tag")
+    image = models.ForeignKey('booru.Post', on_delete=models.CASCADE)
+    tag = models.ForeignKey('booru.Tag', on_delete=models.CASCADE)
+
+class UserFavorites(models.Model):
+    pk = models.CompositePrimaryKey("user", "post")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.ForeignKey('booru.Post', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+# Most composite keys are deleted on tag deletion, but I want blacklist tags to remain in the event of a tag being removed and later re-implemented.
+# If people don't wanna see something, the absolute only way to accidentally put it on their page should be improper tagging of an image itself.
+class UserBlacklist(models.Model):
+    pk = models.CompositePrimaryKey("user", "tag")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    tag = models.ForeignKey('booru.Tag', on_delete=models.DO_NOTHING)

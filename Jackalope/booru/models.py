@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class ViewableManager(models.Manager):
     def get_queryset(self):
-        return (super().get_queryset().filter(status=(Post.Status.PUBLISHED or Post.Status.UNAPPROVED)))
+        return super().get_queryset().exclude(status=Post.Status.DRAFT)
 
 # Models here.
 

@@ -2,13 +2,17 @@ from django.contrib import admin
 from .models import Post
 from .models import Tag
 
-# Register your models here.
-
-admin.site.register(Post)
-admin.site.register(Tag)
+# Needs some TLC that I'm simply not able to give at the moment. "Functions."
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['poster', 'publish', 'status', 'id']
+    list_display = ['title', 'poster', 'publish', 'status', 'id']
+    list_filter = ['poster', 'publish', 'status']
+    search_fields = ['title', 'id']
+    date_hierarchy = 'publish'
+    ordering = ['-status', 'id', 'poster', 'title']
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ['tagName', 'tagSlug', 'id']
+    list_display = ['tagSlug', 'tagName', 'tagType', 'id']
+
+admin.site.register(Post, PostAdmin)
+admin.site.register(Tag, TagAdmin)

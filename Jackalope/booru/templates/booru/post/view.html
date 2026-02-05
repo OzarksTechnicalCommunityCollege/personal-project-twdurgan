@@ -1,12 +1,13 @@
 {% extends "booru/base.html" %}
 
-{% block title %}{{ post.title }}{% endblock %}
+{% block title %}Jackalope - Image {{ post.id }}{% endblock %}
 
+<!--A collapsible list of tags for the post should be displayed to the left of said post, in a vertical list, alongside the count of posts that contain that particular tag.-->
 {% block content %}
     <h1>{{ post.title }}</h1>
     <p class="date">
         Published {{ post.publish }} by {{ post.author }}
     </p>
-    <!--Currently only displays image name. Find a way to display images themselves.-->
-    {{ post.content }}
+    <!--Need to implement buttons to display images at various sizes, "fit width", "fit height", and "original" at least-->
+    <img src="/{{post.content}}" alt="">
 {% endblock %}

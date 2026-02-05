@@ -1,19 +1,29 @@
 {% extends "booru/base.html" %}
 
-{% block title %}My Image Library{% endblock %}
+{% block title %}Jackalope - Posts{% endblock %}
 
 {% block content %}
-    <h1>My Image Library</h1>
+    <h1>Posts</h1>
     {% for post in posts %}
         <h2>
-            <!--Change the linking element to the image itself once title is a nullable field-->
-            <a href="{% url 'booru:post_view' post.id %}">
-                {{ post.title }}
+            <a href="{{ post.get_absolute_url }}">
+                <!--Get rid of inline height and width attributes with more attention paid to booru.css-->
+                <!--I also want to make sure images aren't displayed improperly in thumbnails because they got stretched-->
+                <!--They should be fitted to the 100x100 area if they have >=50% of pixel count of the thumbnail when resized (5,000 total pixels or more)-->
+                <!--They should be cropped to the 100x100 area if they have <50% of said pixel count when resized-->
+                <img src="/{{post.content}}" alt="" height="100px" width="100px">
             </a>
         </h2>
+        {% if post.author %}
         <p class="date">
-            Published {{ post.publish }} by {{ post.author }}
+            {{ post.publish }}, {{ post.author }}
         </p>
+        {% else %}
+        <p class="date">
+            {{ post.publish }}
+        </p>
+        {% endif %}
         {{ post.body|truncatewords:30|linebreaks }}
     {% endfor %}
+    {% include "pagination.html" with page=posts %}
 {% endblock %}

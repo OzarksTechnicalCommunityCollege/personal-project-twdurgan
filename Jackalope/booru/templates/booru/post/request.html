@@ -1,0 +1,19 @@
+{% extends "booru/base.html" %}
+
+{% block title %}Jackalope - Request for post {{ post.id }}{% endblock %}
+
+{% block content %}
+    {% if sent %}
+        <h1>Request sent!</h1>
+        <p>
+        Request for post {{ post.id }} successfully submitted.
+        </p>
+    {% else %}
+        <h1>Request for post {{ post.id }}</h1>
+        <form method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="submit" value="Send request">
+        </form>
+    {% endif %}
+{% endblock %}

@@ -1,9 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+    <!--The HTML and CSS work done so far is quite light; I'd like to make the project as feature-rich as I can before I go making modifications to the appearance-->
+    <!--I think that I'll be most effective at deciding a good layout and design for things once all the components are in place for me to move around.-->
     <head>
-        <title>{% block title %}{% endblock %}</title>
-        <link href="{% static "css/blog.css" %}" rel="stylesheet">
+        <title>{% block title %}Jackalope{% endblock %}</title>
+        <link href="{% static "css/booru.css" %}" rel="stylesheet">
     </head>
     <body>
         <div id="content">
@@ -11,8 +13,8 @@
             {% endblock %}
         </div>
         <div id="sidebar">
-            <h2>My Image Library</h2>
-            <p>Tagging and image display to come!</p>
+            <h2>Jackalope</h2>
+            <p>We're working on it!</p>
         </div>
     </body>
 </html>

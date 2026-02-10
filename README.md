@@ -1,2 +1,15 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=22296130&assignment_repo_type=AssignmentRepo)
-# CSC_161_Personal_Project
+# Jackalope (CSC-161 Personal Project)
+
+This project is a booru! If you're not aware, a booru is similar to an imageboard, in that its main purpose is to host images. The context in which it is doing so is different, however; an imageboard is an innately social platform, where posts do not necessarily require images and contain a block of text for a user to type a public message or reply to another users' message. A booru, on the other hand, is explicitly for archival storage of and easy access to the images on the site. Posts do not require, and are not expected to have, blocks of text containing user-entered messages. Images are (ideally) the only piece of data necessary for the creation of a post on a booru. Ease-of-access for the images stored on a booru is handled via a tagging system denoting the actual content of the imagery being displayed by a post, as well as (in the case of Jackalope, this one) any contextual modifications that an artist (and only the artist) wishes to make, e.g. denoting a transgender person as their preferred gender through tagging even if it might not be discernable to a tagger without prior context. The intention in this design is to give artists more control over the ways that their work is saved and accessed on-site than a TWYS (tag-what-you-see) format allows, wherein only the contents and details directly ascertainable by viewing the image with zero prior context may be used in the process of tagging. While such a model provides a solid framework for tagging by an independent third party, I feel it takes control away from artists and divorces imagery from context, creating a gap between creators and site administrators that this project aims to close.
+
+# Setup
+
+This project does not come packaged with a database or any post images. Run the following commands with python or py (however your OS has you call it) from the Jackalope project folder when starting up for the first time.
+
+1) -m pip install -r requirements.txt
+2) manage.py migrate
+3) manage.py createsuperuser (it will have you enter credentials for an admin user)
+4) manage.py runserver
+
+At this point, assuming all the migrations applied properly (if they don't, you may need to get rid of the included migrations and make your own with "manage.py makemigrations"), you should be able to access the localhost server for the site from 127.0.0.1:8000 and check /admin with the superuser credentials you created. Once you're in, you should be able to make some posts to test out the functionality of the site, which at current only require a title and an image upload. Ideally, that should get trimmed down to only needing an image upload. Once you've made all the posts you want, go to /posts, optionally with a ?page=(page number) to test out pagination.

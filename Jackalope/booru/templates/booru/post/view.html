@@ -9,5 +9,12 @@
         Published {{ post.publish }} by {{ post.author }}
     </p>
     <!--Need to implement buttons to display images at various sizes, "fit width", "fit height", and "original" at least-->
-    <img src="/{{post.content}}" alt="">
+    <img src="/{{post.content}}" alt="{{ post.altText }}">
+    {% if post.status == "PB" %}
+    <p>
+        <a href="{% url "booru:post_request" post.id %}">
+            Request Alteration
+        </a>
+    </p>
+    {% endif %}
 {% endblock %}

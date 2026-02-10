@@ -10,4 +10,5 @@ app_name = 'booru'
 urlpatterns = [
     path('', views.post_list, name='post_list'),
     path('<int:id>/', views.post_view, name='post_view'),
+    path('<int:post_id>/request/', views.post_request, name='post_request')
 ]

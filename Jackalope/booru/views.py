@@ -2,8 +2,9 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView
-from .forms import EmailPostForm
+from .forms import CommentForm, EmailPostForm
 from .models import Post
 
 # Post Views
@@ -42,7 +43,7 @@ def post_list(request):
 # On further consideration though, the manual review period for a post is the point where many changes that would be requested would be made, e.g. deleting inferior duplicate posts.
 # As a result, requests are only going to be implemented on approved posts, being that their functional role is to catch and report mistakes made in the manual review process, which unapproved-but-viewable have not gone through.
 def post_request(request, post_id):
-    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    post = get_object_or_404(Post, id=post_id, status=[Post.Status.PUBLISHED, Post.Status.UNAPPROVED])
     sent = False
     if request.method == 'POST':
         form = EmailPostForm(request.POST)
@@ -68,5 +69,25 @@ def post_request(request, post_id):
             'post': post,
             'form': form,
             'sent': sent
+        }
+    )
+
+# Same problem as the above request form, only this time I do actually want every post to have comments available.
+@require_POST
+def post_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    comment = None
+    form = CommentForm(data=request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.save()
+    return render(
+        request,
+        'booru/post/comment.html',
+        {
+            'post': post,
+            'form': form,
+            'comment': comment
         }
     )

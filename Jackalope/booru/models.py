@@ -4,13 +4,13 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
 
-# Model managers here
+## Model managers here
 
 class ViewableManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().exclude(status=Post.Status.DRAFT)
 
-# Models here.
+## Models here.
 
 class Post(models.Model):
     # Drafts should not display to an end user browsing the site, where published images display normally and unapproved images display with a 'needs approval' notice.
@@ -25,8 +25,8 @@ class Post(models.Model):
     # All user-filled fields besides 'content' (and, potentially, 'tags') should be nullable if possible; anonymous users should be able to post but be severely rate-limited.
     # I've had problems trying to use id as the identifier for a post, particularly when calling __str__ for the model. Will think about solutions down the line.
     title = models.CharField(max_length=250, default="post")
-    description = models.TextField(blank=True, null=True)
-    altText = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True)
+    altText = models.TextField(blank=True)
     # Individuals making posts are fielded as 'poster' because image content should primarily be attributed to an artist via tagging.
     # Posts are not deleted after user deletion; I want posts to remain after posters are gone, with only the actual author of an image able to delete said image externally.
     # Field is nullable, but I'm not sure if AUTH_USER_MODEL interferes with that ability.
@@ -50,7 +50,28 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+# Figure out a way for a user to post either as their account or as an anonymous user with a text-entry name.
+# Both the user and administration should be able to set a comment to inactive, but the user should not be able to reactivate it.
+# This allows users to "delete" comments while still letting moderation take action on those with infringing contents, e.g. doxxing.
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=80, blank=True)
+    body = models.TextField(blank=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created']
+        indexes = [models.Index(fields=['created'])]
+
+    def __str__(self):
+        if self.name == '':
+            return f'Comment by anonymous on {self.post}'
+        else:
+            return f'Comment by {self.name} on {self.post}'
+
 class Tag(models.Model):
     tagName = models.CharField(max_length=250)
     # Slugs are likely going to be required for ease-of-use in searching later down the line, if I had to hazard a guess.
@@ -58,7 +79,7 @@ class Tag(models.Model):
     # Low-priority: I would like tagSlugs to replace whitespace with underscores instead of dashes, as certain nouns that could be used for tagging might have dashes in them, and I find underscores are more readable.
     tagSlug = models.SlugField(max_length=250)
     tagType = models.CharField(max_length=50, default='General')
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.tagName

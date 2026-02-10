@@ -14,5 +14,11 @@ class PostAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ['tagSlug', 'tagName', 'tagType', 'id']
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'post', 'created', 'active']
+    list_filter = ['active', 'created', 'updated']
+    search_fields = ['name', 'body']
+    ordering = ['active', 'post', 'created']
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Tag, TagAdmin)

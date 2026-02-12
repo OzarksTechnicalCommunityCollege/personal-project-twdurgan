@@ -3,9 +3,15 @@
 {% block title %}Jackalope - Posts{% endblock %}
 
 {% block content %}
-    <h1>Posts</h1>
+    {% if tag %}
+        <h1>Posts tagged with {{ tag.name }}</h1>
+    {% else %}
+        <h1>Posts</h1>
+    {% endif %}
     {% for post in posts %}
         <h2>
+            <!--I don't want to display tags under post dates like the book does, but I would like to put a tooltip that shows the tag list, once I know better how django interacts with CSS in particular-->
+            <!--This is because this site format will absolutely lead to posts having huge amounts of tags that would be bulky, cumbersome, and unattractive to display anywhere other than the post page itself.-->
             <a href="{{ post.get_absolute_url }}">
                 <!--Get rid of inline height and width attributes with more attention paid to booru.css-->
                 <!--I also want to make sure images aren't displayed improperly in thumbnails because they got stretched-->

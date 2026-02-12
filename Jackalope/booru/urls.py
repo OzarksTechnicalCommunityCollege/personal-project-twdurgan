@@ -9,6 +9,7 @@ app_name = 'booru'
     # would likely be a messy process and lead to URLs that change frequently. Site and post navigation should be done on-site, via hyperlinks and a robust tag-searching feature.
 urlpatterns = [
     path('', views.post_list, name='post_list'),
+    path('tag/<slug:tag_slug>/', views.post_list, name='post_list_by_tag'),
     path('<int:id>/', views.post_view, name='post_view'),
     path('<int:post_id>/request/', views.post_request, name='post_request'),
     path('<int:post_id>/comment/', views.post_comment, name='post_comment'),

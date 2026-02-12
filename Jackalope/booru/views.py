@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
+from taggit.models import Tag
 from .forms import CommentForm, EmailPostForm
 from .models import Post
 
@@ -34,10 +35,17 @@ def post_view(request, id):
         }
     )
 
-def post_list(request):
+# Currently, searching via tags requires using the slug, but I would like the end user to be able to use the tag name and have the site automatically convert it to the slug in queries.
+# The names of tags will often have extensions for disambiguations, e.g. big_bad_wolf_(hoodwinked) vs big_bad_wolf_(shrek), and I want users to be able to use syntactic differences in tags to better know how to search for what they're searching for.
+# This is also where search functionality will primarily be expanded from; this solution is good for searching a particular tag, but I want to expand functionality to A) multiple tags, and B) other forms of metadata
+def post_list(request, tag_slug=None):
     post_list = Post.viewable.all()
     # When implementing extra-fancy features, might be able to get the number of posts paginated to adjust
-        # based upon the viewport size of the user at the time of navigation.
+    # based upon the viewport size of the user at the time of navigation.
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        post_list = post_list.filter(tags__in=[tag])
     paginator = Paginator(post_list, 25)
     page_number = request.GET.get('page', 1)
     try:
@@ -47,7 +55,14 @@ def post_list(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'booru/post/list.html', {'posts': posts})
+    return render(
+        request,
+        'booru/post/list.html',
+        {
+            'posts': posts,
+            'tag': tag
+        }
+    )
 
 # Originally, this was going to allow for any viewable post to have requests made for it, but using the viewable manager for get_object_or_404 doesn't work.
 # On further consideration though, the manual review period for a post is the point where many changes that would be requested would be made, e.g. deleting inferior duplicate posts.

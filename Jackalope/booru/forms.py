@@ -28,3 +28,5 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['name', 'body']
+
+# TODO: A ModelForm should go here for the creation of posts, though I need to figure out how to change field labels for ModelForms.

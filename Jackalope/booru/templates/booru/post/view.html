@@ -17,4 +17,22 @@
         </a>
     </p>
     {% endif %}
+    {% with comments.count as total_comments %}
+        <h2>
+            {{ total_comments }} comment{{ total_comments|pluralize }}
+        </h2>
+    {% endwith %}
+    {% for comment in comments %}
+        <div class="comment">
+            <p class="info">
+                #{{ forloop.counter }}: {{ comment }}
+                {{ comment.created }}
+            </p>
+            {{ comment.body|linebreaks }}
+        </div>
+    {% empty %}
+        <p>Nobody has commented yet. Be the first!</p>
+    {% endfor %}
+    <!--This should be in a dropdown above the comments section, but it's fine here for now.-->
+    {% include "booru/post/includes/comment_form.html" %}
 {% endblock %}

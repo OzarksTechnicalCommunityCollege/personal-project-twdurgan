@@ -20,7 +20,6 @@ class Post(models.Model):
         UNAPPROVED = 'UA', 'Unapproved'
         PUBLISHED = 'PB', 'Published'
     
-    # The content ImageField is the most important field, make sure to pay attention to the arguments.
     # If I'm feeling ambitious, this might get changed to a FileField to allow for the upload of gifs, videos, and, in a better time, .swf files.
     content = models.ImageField(upload_to="booru\static\img")
     # All user-filled fields besides 'content' (and, potentially, 'tags') should be nullable if possible; anonymous users should be able to post but be severely rate-limited.

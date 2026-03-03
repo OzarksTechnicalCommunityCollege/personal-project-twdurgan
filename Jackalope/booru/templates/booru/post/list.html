@@ -10,14 +10,13 @@
     {% endif %}
     {% for post in posts %}
         <h2>
-            <!--I don't want to display tags under post dates like the book does, but I would like to put a tooltip that shows the tag list, once I know better how django interacts with CSS in particular-->
-            <!--This is because this site format will absolutely lead to posts having huge amounts of tags that would be bulky, cumbersome, and unattractive to display anywhere other than the post page itself.-->
-            <a href="{{ post.get_absolute_url }}">
+            <!--Displays the tags of a post in the hover tooltip.-->
+            <a href="{{ post.get_absolute_url }}" title="{{ post.tags.all|join:" " }}">
                 <!--Get rid of inline height and width attributes with more attention paid to booru.css-->
                 <!--I also want to make sure images aren't displayed improperly in thumbnails because they got stretched-->
                 <!--They should be fitted to the 100x100 area if they have >=50% of pixel count of the thumbnail when resized (5,000 total pixels or more)-->
-                <!--They should be cropped to the 100x100 area if they have <50% of said pixel count when resized-->
-                <img src="/{{post.content}}" alt="" height="100px" width="100px">
+                <!--They should be fitted in only the narrowest dimension of the image, then cropped to the 100x100 area if they have <50% of said pixel count when resized-->
+                <img src="/{{post.content}}" alt="{{ post.tags.all|join:" " }}" height="100px" width="100px">
             </a>
         </h2>
         {% if post.author %}
